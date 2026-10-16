@@ -1,0 +1,33 @@
+# Dépendances et builds
+node_modules
+dist
+coverage
+.wrangler
+
+# Secrets et config locale
+.dev.vars
+.dev.vars.*
+.env
+.env.*
+*.local
+*.pem
+*.key
+
+# Claude Code : réglages perso + skills tiers (restaurables via skills-lock.json)
+.claude/settings.local.json
+.claude/skills/
+
+# Impeccable : artefacts de travail (on garde design.json et surfaces/)
+.impeccable/review
+.impeccable/mocks
+.impeccable/questions
+.impeccable/decision-payload.json
+
+# Logs et fichiers système / éditeur
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea

@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-16T12:00:00Z",
+  "title": "Design System: Foulée",
+  "extensions": {
+    "colorMeta": {
+      "paper": { "role": "neutral", "displayName": "Papier", "canonical": "#ffffff", "dark": "#000000", "tonalRamp": ["#1f1f1f", "#3a3a3a", "#5e5e5e", "#858585", "#adadad", "#d1d1d1", "#ececec", "#ffffff"] },
+      "grid": { "role": "neutral", "displayName": "Ligne de construction", "canonical": "#dde1ea", "dark": "#1c2028", "tonalRamp": ["#1c2028", "#343a46", "#525a69", "#737c8d", "#959daf", "#b8bfcd", "#dde1ea", "#f3f5f8"] },
+      "ink": { "role": "neutral", "displayName": "Encre", "canonical": "#111111", "dark": "#f2f3f5", "tonalRamp": ["#111111", "#2b2b2b", "#474747", "#666666", "#878787", "#a9a9a9", "#cccccc", "#efefef"] },
+      "ink-2": { "role": "neutral", "displayName": "Encre seconde", "canonical": "#3d4350", "dark": "#c3c8d2", "tonalRamp": ["#181b21", "#2a2f38", "#3d4350", "#5a6170", "#7c8392", "#a1a7b4", "#c7ccd5", "#eceef2"] },
+      "ink-3": { "role": "neutral", "displayName": "Encre tierce", "canonical": "#5b6170", "dark": "#9aa1af", "tonalRamp": ["#1d2026", "#30343d", "#454a56", "#5b6170", "#7b8291", "#9ea4b2", "#c3c8d2", "#e9ebef"] },
+      "red": { "role": "primary", "displayName": "Rouge signal", "canonical": "#ff3d00", "tonalRamp": ["#3d0d00", "#6b1a00", "#a82700", "#c42e00", "#ff3d00", "#ff7a4d", "#ffb399", "#ffe6dd"] },
+      "red-deep": { "role": "primary", "displayName": "Rouge brique", "canonical": "#c42e00", "tonalRamp": ["#3d0d00", "#6b1a00", "#a82700", "#c42e00", "#e83800", "#ff7a4d", "#ffb399", "#ffe6dd"] },
+      "on-red": { "role": "neutral", "displayName": "Blanc sur rouge", "canonical": "#ffffff", "tonalRamp": ["#1f1f1f", "#3a3a3a", "#5e5e5e", "#858585", "#adadad", "#d1d1d1", "#ececec", "#ffffff"] },
+      "red-wash": { "role": "neutral", "displayName": "Lavis", "canonical": "#eef0f4", "dark": "#161a21", "tonalRamp": ["#161a21", "#2c323d", "#4a5262", "#6d7687", "#949cab", "#bcc2cd", "#dde1ea", "#eef0f4"] },
+      "bar": { "role": "neutral", "displayName": "Barre d'app", "canonical": "#111111", "dark": "#000000", "tonalRamp": ["#000000", "#111111", "#2b2b2b", "#474747", "#666666", "#878787", "#a9a9a9", "#cccccc"] },
+      "on-bar": { "role": "neutral", "displayName": "Blanc sur barre", "canonical": "#ffffff", "tonalRamp": ["#1f1f1f", "#3a3a3a", "#5e5e5e", "#858585", "#adadad", "#d1d1d1", "#ececec", "#ffffff"] },
+      "on-bar-2": { "role": "neutral", "displayName": "Gris barre", "canonical": "#b9bec9", "tonalRamp": ["#1e2127", "#363b45", "#545a66", "#757c89", "#979dab", "#b9bec9", "#d9dce3", "#f2f3f6"] },
+      "hatch": { "role": "neutral", "displayName": "Hachure", "canonical": "#b9bec9", "dark": "#262b35", "tonalRamp": ["#1e2127", "#363b45", "#545a66", "#757c89", "#979dab", "#b9bec9", "#d9dce3", "#f2f3f6"] },
+      "i-rest": { "role": "neutral", "displayName": "Intensité repos", "canonical": "#c4c9d3", "dark": "#4a505c", "tonalRamp": ["#1f2228", "#383d47", "#4a505c", "#6b7280", "#8f96a3", "#b0b6c1", "#c4c9d3", "#eceef2"] },
+      "i-easy": { "role": "neutral", "displayName": "Intensité endurance", "canonical": "#111111", "dark": "#f2f3f5", "tonalRamp": ["#111111", "#2b2b2b", "#474747", "#666666", "#878787", "#a9a9a9", "#cccccc", "#efefef"] },
+      "i-mod": { "role": "neutral", "displayName": "Intensité modérée", "canonical": "#8c93a3", "tonalRamp": ["#1e2026", "#353943", "#50555f", "#6d7383", "#8c93a3", "#adb2bf", "#ced2da", "#eeeff3"] },
+      "i-hard": { "role": "primary", "displayName": "Intensité dure", "canonical": "#ff3d00", "tonalRamp": ["#3d0d00", "#6b1a00", "#a82700", "#c42e00", "#ff3d00", "#ff7a4d", "#ffb399", "#ffe6dd"] },
+      "i-max": { "role": "primary", "displayName": "Intensité max", "canonical": "#a82700", "tonalRamp": ["#2a0900", "#4f1300", "#7a1d00", "#a82700", "#d23100", "#ff6a33", "#ffa580", "#ffe0d4"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "La durée de la séance du jour, chiffre monumental unique de la page Aujourd'hui." },
+      "display-page": { "displayName": "Display de page", "purpose": "Le chiffre monumental des autres pages (temps prédit, points de forme)." },
+      "metric": { "displayName": "Metric", "purpose": "Chiffre isolé d'un bloc sans boîte (forme, VMA, efficacité cardio)." },
+      "headline": { "displayName": "Headline", "purpose": "Titre de page ; 44 px sous 900 px." },
+      "title": { "displayName": "Title", "purpose": "Titres de section." },
+      "title-sm": { "displayName": "Title petit", "purpose": "Titres de boîte et de sous-section." },
+      "numeral": { "displayName": "Numeral", "purpose": "Allures, durées d'étape, numéros de jour et de semaine, valeurs du bandeau clé ; jamais sous 20 px." },
+      "body": { "displayName": "Body", "purpose": "Texte courant et analyse du coach (70ch max)." },
+      "label": { "displayName": "Label", "purpose": "Intitulés de champ, en-têtes de tableau, phases, légendes ; sans capitales forcées." },
+      "tnum": { "displayName": "Chiffres d'interface", "purpose": "Tout nombre sous 20 px : graduations, bpm, valeurs de début et fin de courbe." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "ease", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Courbe unique de toutes les transitions d'état." },
+      { "name": "duration-state", "value": "150ms", "purpose": "Couleur et fond des boutons, onglets, étapes." },
+      { "name": "duration-toggle", "value": "160ms", "purpose": "Curseur de l'interrupteur, opacité des segments du profil de séance." },
+      { "name": "reduced-motion", "value": "0.01ms", "purpose": "Sous prefers-reduced-motion, animations et transitions neutralisées." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "560px" },
+      { "name": "md", "value": "720px" },
+      { "name": "nav", "value": "900px" },
+      { "name": "split", "value": "1100px" }
+    ],
+    "grid": { "cell": "24px", "color": "var(--grid)", "lineOffset": "lignes en y = 24k - 1 (background-position: -1px -1px)", "axisGutter": "48px", "niceSteps": [1, 2, 2.5, 5, 10] },
+    "darkMode": {
+      "selector": "@media (prefers-color-scheme: dark) :root:not([data-theme='light'])",
+      "tokens": { "paper": "#000000", "grid": "#1c2028", "surface": "#0b0c0e", "ink": "#f2f3f5", "ink-2": "#c3c8d2", "ink-3": "#9aa1af", "rule": "#f2f3f5", "rule-soft": "#262b35", "red-wash": "#161a21", "bar": "#000000", "hatch": "#262b35", "i-rest": "#4a505c", "i-easy": "#f2f3f5" }
+    }
+  },
+  "components": [
+    {
+      "name": "Bouton primaire",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Action principale : rectangle d'encre qui passe au rouge au survol.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">Enregistrer</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 18px; border: 1px solid transparent; border-radius: 0; font-family: 'Work Sans Variable', 'Work Sans', system-ui, sans-serif; font-weight: 600; font-size: 14.5px; cursor: pointer; transition: background 150ms cubic-bezier(0.16,1,0.3,1), color 150ms cubic-bezier(0.16,1,0.3,1); } .ds-btn-primary { background: var(--ink, #111111); color: var(--paper, #ffffff); } .ds-btn-primary:hover { background: var(--red, #ff3d00); color: var(--on-red, #ffffff); } .ds-btn:focus-visible { outline: 2px solid var(--red, #ff3d00); outline-offset: 2px; }"
+    },
+    {
+      "name": "Bouton secondaire",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Papier cerné d'encre ; s'inverse en encre pleine au survol.",
+      "html": "<button class=\"ds-btn2\">Ouvrir la séance</button>",
+      "css": ".ds-btn2 { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border: 1px solid var(--ink, #111111); border-radius: 0; background: var(--paper, #ffffff); color: var(--ink, #111111); font-family: 'Work Sans Variable', 'Work Sans', system-ui, sans-serif; font-weight: 600; font-size: 14.5px; cursor: pointer; transition: background 150ms cubic-bezier(0.16,1,0.3,1), color 150ms cubic-bezier(0.16,1,0.3,1); } .ds-btn2:hover { background: var(--ink, #111111); color: var(--paper, #ffffff); } .ds-btn2:focus-visible { outline: 2px solid var(--red, #ff3d00); outline-offset: 2px; }"
+    },
+    {
+      "name": "Bouton accent",
+      "kind": "button",
+      "refersTo": "button-accent",
+      "description": "Aplat rouge, réservé à l'action liée au présent.",
+      "html": "<button class=\"ds-btn-accent\">Démarrer</button>",
+      "css": ".ds-btn-accent { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border: 0; border-radius: 0; background: var(--red, #ff3d00); color: var(--on-red, #ffffff); font-family: 'Work Sans Variable', 'Work Sans', system-ui, sans-serif; font-weight: 600; font-size: 14.5px; cursor: pointer; transition: background 150ms cubic-bezier(0.16,1,0.3,1); } .ds-btn-accent:hover { background: var(--red-deep, #c42e00); } .ds-btn-accent:focus-visible { outline: 2px solid var(--ink, #111111); outline-offset: 2px; }"
+    },
+    {
+      "name": "Champ texte",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Filet d'encre, angle droit, caret et focus rouges.",
+      "html": "<label class=\"ds-field\"><span>Commentaire (facultatif)</span><input class=\"ds-input\" type=\"text\" placeholder=\"Jambes lourdes, chaleur…\"></label>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 6px; font-family: 'Work Sans Variable', 'Work Sans', system-ui, sans-serif; } .ds-field > span { font-size: 13px; font-weight: 600; color: var(--ink-2, #3d4350); } .ds-input { font: inherit; font-size: 15px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--ink, #111111); border-radius: 0; background: var(--paper, #ffffff); color: var(--ink, #111111); caret-color: var(--red, #ff3d00); } .ds-input:focus-visible { outline: 2px solid var(--red, #ff3d00); outline-offset: -2px; }"
+    },
+    {
+      "name": "Barre d'app",
+      "kind": "nav",
+      "refersTo": "appbar",
+      "description": "Barre noire de 72 px ; onglet actif blanc souligné de 4 px rouge.",
+      "html": "<nav class=\"ds-appbar\"><span class=\"ds-brand\">FOULÉE</span><a class=\"ds-tab ds-active\" href=\"#\">Aujourd’hui</a><a class=\"ds-tab\" href=\"#\">Plan</a><a class=\"ds-tab\" href=\"#\">Forme</a></nav>",
+      "css": ".ds-appbar { display: flex; align-items: stretch; gap: 2px; height: 72px; padding: 0 48px; background: var(--bar, #111111); font-family: 'Work Sans Variable', 'Work Sans', system-ui, sans-serif; } .ds-brand { display: flex; align-items: center; margin-right: 38px; font-family: 'Big Shoulders Display Variable', 'Big Shoulders Display', 'Arial Narrow', sans-serif; font-weight: 900; font-size: 30px; color: var(--on-bar, #ffffff); } .ds-tab { display: flex; align-items: center; padding: 0 14px; color: var(--on-bar-2, #b9bec9); font-weight: 500; text-decoration: none; border-top: 4px solid transparent; border-bottom: 4px solid transparent; transition: color 150ms cubic-bezier(0.16,1,0.3,1); } .ds-tab:hover { color: var(--on-bar, #ffffff); } .ds-tab.ds-active { color: var(--on-bar, #ffffff); border-bottom-color: var(--red, #ff3d00); } .ds-tab:focus-visible { outline: 2px solid var(--red, #ff3d00); outline-offset: -2px; }"
+    },
+    {
+      "name": "Contrôle segmenté",
+      "kind": "chip",
+      "refersTo": "chip-selected",
+      "description": "Cellules jointives dans un filet ; la sélection s'inverse en encre.",
+      "html": "<div class=\"ds-seg\"><button aria-pressed=\"true\">Faite</button><button aria-pressed=\"false\">Pas faite</button></div>",
+      "css": ".ds-seg { display: inline-flex; border: 1px solid var(--ink, #111111); background: var(--paper, #ffffff); } .ds-seg button { font-family: 'Work Sans Variable', 'Work Sans', system-ui, sans-serif; font-size: 14px; font-weight: 600; min-height: 40px; padding: 0 14px; border: 0; border-left: 1px solid var(--ink, #111111); background: transparent; color: var(--ink-2, #3d4350); cursor: pointer; } .ds-seg button:first-child { border-left: 0; } .ds-seg button:hover { color: var(--ink, #111111); background: var(--red-wash, #eef0f4); } .ds-seg button[aria-pressed='true'] { background: var(--ink, #111111); color: var(--paper, #ffffff); } .ds-seg button:focus-visible { outline: 2px solid var(--red, #ff3d00); outline-offset: -2px; }"
+    },
+    {
+      "name": "Semaine en 7 cellules",
+      "kind": "custom",
+      "refersTo": "week-cell",
+      "description": "Signature : 7 cellules de 144 px, aujourd'hui en aplat rouge, autres sports hachurés.",
+      "html": "<div class=\"ds-week\"><button class=\"ds-wday\"><span class=\"ds-wn\">Jeu</span><span class=\"ds-wnum\">15</span><span class=\"ds-wwhat\">Repos</span></button><button class=\"ds-wday ds-today\"><span class=\"ds-wn\">Ven</span><span class=\"ds-wnum\">16</span><span class=\"ds-wwhat\">Handball<small>1 h 30</small></span></button><button class=\"ds-wday ds-cross\"><span class=\"ds-wn\">Sam</span><span class=\"ds-wnum\">17</span><span class=\"ds-wwhat\">Handball<small>1 h 00</small></span></button><button class=\"ds-wday\"><span class=\"ds-wn\">Dim</span><span class=\"ds-wnum\">18</span><span class=\"ds-wwhat\">Sortie longue<small>1 h 45</small></span></button></div>",
+      "css": ".ds-week { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--ink, #111111); background: var(--paper, #ffffff); font-family: 'Work Sans Variable', 'Work Sans', system-ui, sans-serif; } .ds-wday { font: inherit; display: flex; flex-direction: column; min-height: 144px; padding: 8px; border: 0; border-left: 1px solid var(--ink, #111111); background: transparent; color: var(--ink, #111111); text-align: left; cursor: pointer; } .ds-wday:first-child { border-left: 0; } .ds-wday:hover:not(.ds-today) { background: var(--red-wash, #eef0f4); } .ds-wday:focus-visible { outline: 2px solid var(--ink, #111111); outline-offset: -2px; } .ds-today { background: var(--red, #ff3d00); color: var(--on-red, #ffffff); } .ds-cross { background: repeating-linear-gradient(0deg, var(--paper, #ffffff) 0 5px, var(--hatch, #b9bec9) 5px 6px); } .ds-wn { font-size: 12px; color: var(--ink-3, #5b6170); } .ds-today .ds-wn { color: var(--on-red, #ffffff); } .ds-wnum { font-family: 'Big Shoulders Display Variable', 'Big Shoulders Display', 'Arial Narrow', sans-serif; font-weight: 900; font-size: 40px; line-height: 1; } .ds-wwhat { margin-top: auto; font-size: 12.5px; font-weight: 600; line-height: 1.25; } .ds-wwhat small { display: block; font-size: 12px; font-weight: 400; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Graphe sur grille",
+      "kind": "custom",
+      "refersTo": "",
+      "description": "Signature : barres tracées sur la grille de 24 px, une ligne = un pas rond, valeurs dans la marge de 48 px, semaine en cours en rouge.",
+      "html": "<div class=\"ds-gridchart\"><div class=\"ds-axis\"><span style=\"top:0\">60 km</span><span style=\"top:48px\">40</span><span style=\"top:96px\">20</span></div><div class=\"ds-bars\"><i style=\"height:96px\"></i><i style=\"height:72px\"></i><i style=\"height:120px\"></i><i style=\"height:48px;background:var(--i-rest,#c4c9d3)\"></i><i style=\"height:132px\"></i><i class=\"ds-now\" style=\"height:60px\"></i></div></div>",
+      "css": ".ds-gridchart { position: relative; height: 144px; margin-left: 48px; background-color: var(--paper, #ffffff); background-image: linear-gradient(var(--grid, #dde1ea) 1px, transparent 1px), linear-gradient(90deg, var(--grid, #dde1ea) 1px, transparent 1px); background-size: 24px 24px; font-family: 'Work Sans Variable', 'Work Sans', system-ui, sans-serif; } .ds-axis { position: absolute; left: -48px; top: 0; width: 40px; height: 144px; } .ds-axis span { position: absolute; right: 0; transform: translateY(-50%); font-size: 12px; color: var(--ink-3, #5b6170); font-variant-numeric: tabular-nums; background: var(--paper, #ffffff); padding: 0 2px; white-space: nowrap; } .ds-bars { position: absolute; inset: 0; display: flex; align-items: flex-end; gap: 4px; border-bottom: 1px solid var(--ink, #111111); } .ds-bars i { flex: 1; background: var(--ink, #111111); transition: background 150ms cubic-bezier(0.16,1,0.3,1); } .ds-bars i:hover { background: var(--ink-2, #3d4350); } .ds-bars i.ds-now { background: var(--red, #ff3d00); }"
+    },
+    {
+      "name": "Ligne de données",
+      "kind": "custom",
+      "refersTo": "",
+      "description": "Mesures secondaires en une phrase réglée entre deux filets, jamais en cellules.",
+      "html": "<p class=\"ds-dataline\"><b>34 km</b> par semaine en moyenne sur 4 semaines, <b>3,6</b> sorties par semaine, <b>398 m/h</b> de vitesse en montée.</p>",
+      "css": ".ds-dataline { margin: 0; padding: 11px 0; border-top: 1px solid var(--ink, #111111); border-bottom: 1px solid var(--ink, #111111); font-family: 'Work Sans Variable', 'Work Sans', system-ui, sans-serif; font-size: 15px; line-height: 1.5; font-variant-numeric: tabular-nums; color: var(--ink-2, #3d4350); } .ds-dataline b { color: var(--ink, #111111); font-weight: 600; }"
+    },
+    {
+      "name": "Bandeau clé",
+      "kind": "custom",
+      "refersTo": "key-plane",
+      "description": "Seule grille de cellules chiffrées, réservée à la séance clé du jour : aplat rouge, filets blancs.",
+      "html": "<div class=\"ds-plane\"><div class=\"ds-fact\"><span class=\"ds-l\">Distance</span><span class=\"ds-v\">16,8 km</span></div><div class=\"ds-fact\"><span class=\"ds-l\">D+ visé</span><span class=\"ds-v\">635 m</span></div><div class=\"ds-fact\"><span class=\"ds-l\">Charge</span><span class=\"ds-v\">91</span></div></div>",
+      "css": ".ds-plane { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); background: var(--red, #ff3d00); border: 1px solid var(--red, #ff3d00); color: var(--on-red, #ffffff); font-family: 'Work Sans Variable', 'Work Sans', system-ui, sans-serif; } .ds-fact { display: flex; flex-direction: column; padding: 10px 14px; border-left: 1px solid rgb(255 255 255 / 0.4); } .ds-fact:first-child { border-left: 0; } .ds-l { font-size: 12.5px; } .ds-v { font-family: 'Big Shoulders Display Variable', 'Big Shoulders Display', 'Arial Narrow', sans-serif; font-variant-numeric: tabular-nums; font-size: 32px; font-weight: 800; line-height: 1.05; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Le spécimen Crouwel",
+    "overview": "Le plan d'entraînement se lit comme une planche de spécimen typographique : une grille de construction de 24 px, visible sur toute la page, porte chaque élément. Le chiffre qui compte (durée du jour, temps prédit, forme) est monumental et posé sur cette grille ; les graphes sont tracés sur ses lignes, si bien que la grille est à la fois décor et axe de mesure. Encre noire, papier blanc, un seul aplat rouge.\n\nL'appli est d'usage (mode Operate) : densité maîtrisée, filets fins, tableaux réglés, phrases courtes en Work Sans. L'ambition visuelle tient en trois gestes seulement : la grille, le chiffre monumental, l'aplat rouge. Rejet confirmé : le tableau de bord SaaS en cartes arrondies avec ombres et « gros chiffre + petit libellé », et l'ancienne carte IGN.",
+    "keyCharacteristics": [
+      "Grille de construction visible (24 px, #DDE1EA) sur fond blanc pur ; les graphes s'y calent.",
+      "Un chiffre monumental par page, en Big Shoulders Display 900.",
+      "Un seul aplat saturé, rouge #FF3D00, réservé à « maintenant » : jour, séance clé, semaine en cours, point de donnée du jour.",
+      "Filets noirs d'1 px, angles droits, aucune ombre portée.",
+      "Mesures secondaires en une phrase réglée, pas en cellules."
+    ],
+    "rules": [
+      { "name": "La règle du Seul Aplat", "body": "Le rouge signal ne marque que le présent : aujourd'hui, la séance clé, la semaine en cours, la dernière valeur d'une courbe. Si un écran a deux aplats rouges sans lien avec « maintenant », l'un est de trop.", "section": "colors" },
+      { "name": "La règle Encre et Papier", "body": "Tout le reste est noir, blanc ou gris de la rampe. Aucune autre teinte, aucun dégradé de couleur ; linear-gradient ne sert qu'à tracer la grille, les hachures et le squelette de chargement.", "section": "colors" },
+      { "name": "La règle des 20 pixels", "body": "Big Shoulders Display ne descend jamais sous 20 px. En dessous, un nombre passe en Work Sans avec font-variant-numeric: tabular-nums (.tnum).", "section": "typography" },
+      { "name": "La règle du Chiffre Monumental", "body": "Chaque page a un seul chiffre en Display ou Display de page. Un deuxième chiffre géant le dévalue.", "section": "typography" },
+      { "name": "La règle Tracé sur Grille", "body": "Un graphe est dessiné sur la grille de la page, pas dans un cadre. useGridSnap décale le tracé pour que son haut tombe sur une ligne de fond ; la hauteur du tracé est un multiple entier de 24 px ; chaque ligne de grille vaut un pas rond (1, 2, 2,5, 5, 10…) ; les valeurs sont écrites dans une marge de 48 px à gauche (et à droite pour un second axe), sur fond papier pour masquer la grille sous le chiffre. La légende dit « une ligne de grille = 10 km ».", "section": "layout" },
+      { "name": "La règle de la Feuille Posée", "body": "Pas d'ombre portée, jamais. Pour détacher un élément, on le rend opaque et on l'entoure d'un filet noir.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do laisser la grille de 24 px visible partout et poser chaque bloc opaque dessus.",
+      "Do caler tout nouveau graphe avec useGridSnap : hauteur en multiple de 24 px, une ligne de grille = un pas rond, valeurs dans la marge de 48 px.",
+      "Do donner à chaque page un seul chiffre monumental en Big Shoulders 900.",
+      "Do écrire les mesures secondaires en une phrase réglée (.dataline).",
+      "Do réserver le rouge #FF3D00 au présent : jour, séance clé, semaine en cours, dernière valeur.",
+      "Do passer tout nombre sous 20 px en Work Sans à chiffres tabulaires (.tnum).",
+      "Do suivre la rampe d'intensité gris, noir, gris moyen, rouge, brique pour colorer un effort."
+    ],
+    "donts": [
+      "Don't arrondir un angle, ni ajouter une ombre portée.",
+      "Don't utiliser un filet latéral coloré épais comme accent (bande verticale à gauche d'un bloc ou d'une ligne).",
+      "Don't aligner des cellules « libellé + chiffre » pour des mesures secondaires ; la seule grille de cellules chiffrées est le bandeau rouge de la séance clé.",
+      "Don't utiliser Big Shoulders Display sous 20 px.",
+      "Don't introduire une deuxième couleur d'accent ou un dégradé de couleur.",
+      "Don't enfermer un graphe dans un cadre à graduations propres, détaché de la grille de la page.",
+      "Don't revenir aux cartes empilées arrondies, au gros chiffre sur petit libellé de tableau de bord, ni à la carte IGN."
+    ]
+  }
+}
