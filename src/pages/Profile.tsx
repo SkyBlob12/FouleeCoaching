@@ -89,7 +89,7 @@ const fingerprint = (p: SavedProfile) =>
   ]);
 
 export function Profile() {
-  const { saved, profile, saveProfile, plan, updatePlan, activities } = useReady();
+  const { saved, profile, saveProfile, plan, updatePlan, activities, records } = useReady();
   const location = useLocation();
   const navigate = useNavigate();
   const tab: Tab = TABS.find((t) => `#${t.id}` === location.hash)?.id ?? 'entrainement';
@@ -144,7 +144,7 @@ export function Profile() {
   };
   const dirty = fingerprint(draft) !== fingerprint(s);
   // niveau obtenu avec les valeurs saisies (même calcul que le serveur)
-  const draftProfile = resolveProfile(draft, estimateFrom(activities, draft));
+  const draftProfile = resolveProfile(draft, estimateFrom(activities, draft, records.efforts));
 
   const save = async () => {
     setBusy(true);
@@ -177,7 +177,11 @@ export function Profile() {
     draftProfile.vdotSource === src ? (
       <span className="tag">Utilisée</span>
     ) : draftProfile.vdotSamples.some((x) => x.method === src) ? (
-      <span className="tag">Comptée dans la moyenne</span>
+      <span className="tag">Prise en compte</span>
+    ) : draftProfile.hrCalibration?.anchor.method === src ? (
+      <span className="tag">Calibre ton cardio</span>
+    ) : src !== 'manual' && (src === 'declared_race' ? draft.race : draft.vmaTest) ? (
+      <span className="tag">Trop ancienne, plus comptée</span>
     ) : null;
 
   return (
@@ -249,9 +253,10 @@ export function Profile() {
               title="Ton niveau"
               intro={
                 <>
-                  Il fixe toutes tes allures. C’est la moyenne de tes 10 dernières mesures de moins de 4 mois : tes sorties Strava avec cardio, tes courses,
-                  et la course et le test VMA ci-dessous s’ils sont assez récents. Sans assez de sorties, Foulée prend le test VMA (moins de 6 mois) ou la course
-                  (moins d’un an). Une VO2 max forcée remplace tout.
+                  Il fixe toutes tes allures, d’après ce que tu as couru ces 4 derniers mois. D’abord tes courses (Strava ou ci-dessous) et ton test VMA ;
+                  sans course, la moyenne cardio de tes 10 dernières sorties. Ton meilleur effort Strava récent (5 km, 10 km… le plus rapide couru dans une
+                  sortie) sert toujours de plancher. Une course ou un test de moins d’un an calibre ton cardio : chacun a sa propre FC à allure égale, et
+                  c’est la course qui donne le niveau absolu. Une VO2 max forcée remplace tout.
                   {draftProfile.vdot !== profile.vdot && (
                     <>
                       {' '}

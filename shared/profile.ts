@@ -57,9 +57,15 @@ export function declaredSamples(s: SavedProfile | null | undefined): Vo2Sample[]
 
 export type EffectiveProfile = AthleteProfile & {
   weeklyElevation: number;
-  vdotSource: VdotSource | 'manual' | 'declared_race' | 'vma_test';
-  /** mesures moyennées quand vdotSource = activities (la plus récente d'abord) */
+  vdotSource: VdotSource | 'manual';
+  /** mesures prises en compte par l'estimation (la plus récente d'abord) */
   vdotSamples: Vo2Sample[];
+  /** la mesure qui fixe le niveau (course, test, meilleur effort), absente pour la moyenne cardio */
+  vdotBasis?: Vo2Sample;
+  /** moyenne cardio de tes dernières sorties, quand il y en a assez */
+  hrVdot?: number;
+  /** calibrage du cardio sur ta dernière course */
+  hrCalibration?: FitnessEstimate['hrCalibration'];
   /** d'où vient la FC seuil */
   lthrSource?: 'declared' | 'activities' | 'hr_max';
   /** ajustement issu des ressentis, déjà inclus dans vdot */
@@ -72,12 +78,17 @@ export function resolveProfile(saved: SavedProfile | null, estimate: FitnessEsti
   const s: SavedProfile = saved ?? { level: 'intermediaire', sport: 'road' };
   let vdot = estimate.vdot;
   let vdotSource: EffectiveProfile['vdotSource'] = estimate.source;
-  const declared = declaredVdot(s, todayIso);
-  // VO2 max forcée d'abord, puis la moyenne des dernières mesures (qui inclut course et test déclarés),
-  // puis une course ou un test déclarés seuls quand les mesures manquent
-  if (declared && (declared.source === 'manual' || estimate.source !== 'activities')) {
-    vdot = declared.vdot;
-    vdotSource = declared.source;
+  // seule une VO2 max forcée à la main passe devant : course et test déclarés sont déjà comptés
+  // dans l'estimation, à leur date, au même titre que les courses Strava (une vieille course ne dicte plus le niveau)
+  if (s.vdotManual) {
+    vdot = s.vdotManual;
+    vdotSource = 'manual';
+  } else if (estimate.source === 'default') {
+    const declared = declaredVdot(s, todayIso);
+    if (declared) {
+      vdot = declared.vdot;
+      vdotSource = declared.source;
+    }
   }
   const vdotOffset = s.vdotOffset ?? 0;
   vdot = clampVdot(vdot + vdotOffset);
@@ -86,7 +97,10 @@ export function resolveProfile(saved: SavedProfile | null, estimate: FitnessEsti
   return {
     vdot: Math.round(vdot * 10) / 10,
     vdotSource,
-    vdotSamples: vdotSource === 'activities' ? estimate.samples : [],
+    vdotSamples: vdotSource === 'manual' ? [] : estimate.samples,
+    vdotBasis: vdotSource === 'manual' ? undefined : estimate.basis,
+    hrVdot: estimate.hrVdot,
+    hrCalibration: estimate.hrCalibration,
     lthrSource: s.lthr ? 'declared' : estimate.lthr ? 'activities' : hrMax || s.birthYear ? 'hr_max' : undefined,
     vdotOffset,
     vma: Math.round(vmaFromVdot(vdot) * 10) / 10,

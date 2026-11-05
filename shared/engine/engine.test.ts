@@ -29,6 +29,8 @@ import {
   vo2Progression,
   vo2Samples,
   gapPace,
+  perfValue,
+  endurancePenalty,
   type ActivitySummary,
 } from './index';
 import { declaredSamples, resolveProfile } from '../profile';
@@ -385,16 +387,81 @@ describe('Niveau : moyenne des dernières sorties', () => {
     expect(activityVo2(run('2026-09-01', 50, 0.68, { movingTimeSec: 600 }), hr)).toBeNull();
   });
 
-  it('moyenne les 10 dernières mesures sans qu’une course isolée ne dicte le niveau', () => {
+  it('moyenne les 10 dernières sorties cardio quand il n’y a pas de course', () => {
     const acts = days(12).map((d, i) => run(d, 50, 0.65 + (i % 4) * 0.07));
-    // une course exceptionnelle, ancienne règle : elle aurait fixé toutes les allures
-    acts.push({ ...run('2026-10-05', 50, 0.9), name: '10 km', isRace: true, distanceM: 10000, movingTimeSec: 38 * 60, avgHr: 178 });
     const e = estimateFitness(acts, '2026-10-10', { hrMax: 190, hrRest: 50 });
     expect(e.source).toBe('activities');
     expect(e.samples).toHaveLength(10);
-    expect(vdotFromRace(10000, 38 * 60)).toBeGreaterThan(54);
     expect(e.vdot).toBeGreaterThan(49);
-    expect(e.vdot).toBeLessThan(51.5);
+    expect(e.vdot).toBeLessThan(51);
+  });
+
+  it('une course récente fixe le niveau ; le cardio la relève d’au plus 2 points, jamais ne la baisse', () => {
+    const acts = days(12).map((d, i) => run(d, 50, 0.65 + (i % 4) * 0.07));
+    acts.push({ ...run('2026-10-05', 50, 0.9), name: '10 km', isRace: true, distanceM: 10000, movingTimeSec: 38 * 60, avgHr: 178 });
+    const e = estimateFitness(acts, '2026-10-10', { hrMax: 190, hrRest: 50 });
+    expect(e.source).toBe('race');
+    expect(e.vdot).toBeCloseTo(vdotFromRace(10000, 38 * 60), 0);
+    // course lente, cardio qui dit 50 : relevée de 2 points au plus
+    const slow = days(12).map((d, i) => run(d, 50, 0.65 + (i % 4) * 0.07));
+    slow.push({ ...run('2026-10-05', 50, 0.9), name: '10 km', isRace: true, distanceM: 10000, movingTimeSec: 50 * 60, avgHr: 178 });
+    const r = vdotFromRace(10000, 50 * 60);
+    expect(estimateFitness(slow, '2026-10-10', { hrMax: 190, hrRest: 50 }).vdot).toBeCloseTo(r + 2, 0);
+  });
+
+  it('le meilleur effort Strava récent est un plancher', () => {
+    // cardio pessimiste (FC élevée) : 3 sorties qui disent ~40
+    const acts = days(4).map((d) => run(d, 40, 0.8));
+    const fast = acts[3];
+    const details = [{ id: fast.id, bestEfforts: [{ name: '1K', distanceM: 1000, movingTimeSec: 180 }, { name: '5K', distanceM: 5000, movingTimeSec: 21 * 60 }] }];
+    const e = estimateFitness(acts, '2026-09-12', { hrMax: 190, hrRest: 50 }, [], details);
+    expect(e.source).toBe('best_effort');
+    expect(e.basis?.effort?.label).toBe('5 km');
+    // le 1 km n'est pas retenu (trop court) : le niveau vient du 5 km
+    expect(e.vdot).toBeCloseTo(vdotFromRace(5000, 21 * 60), 1);
+  });
+
+  it('une course déclarée de plus de 4 mois ne dicte plus le niveau quand Strava a mieux', () => {
+    const saved = { level: 'debutant' as const, sport: 'trail' as const, race: { distanceKm: 5, timeSec: 1390, date: '2026-04-26' } };
+    const acts = days(6, '2026-10-01').map((d) => run(d, 46, 0.72));
+    const e = estimateFitness(acts, '2026-11-05', { hrMax: 190, hrRest: 50 }, declaredSamples(saved));
+    expect(e.source).toBe('activities');
+    const p = resolveProfile(saved, e, '2026-11-05');
+    expect(p.vdotSource).toBe('activities');
+    expect(p.vdot).toBeGreaterThan(45);
+    // sans aucune donnée Strava, la course déclarée sert de repli, érodée par l'âge
+    const none = estimateFitness([], '2026-11-05', undefined, declaredSamples(saved));
+    expect(none.source).toBe('declared_race');
+    expect(none.vdot).toBeLessThan(vdotFromRace(5000, 1390));
+  });
+
+  it('calibre le cardio sur la dernière course quand la FC tourne plus haut que la moyenne', () => {
+    // coureur VDOT 42 dont le cardio, à allure égale, dit 35 (FC haute en endurance)
+    const spring = days(5, '2026-05-01').map((d) => run(d, 35, 0.7));
+    const autumn = days(6, '2026-10-10').map((d) => run(d, 33, 0.7));
+    const declared = declaredSamples({ level: 'intermediaire', sport: 'road', race: { distanceKm: 5, timeSec: 1390, date: '2026-04-26' } });
+    const e = estimateFitness([...spring, ...autumn], '2026-10-30', { hrMax: 190, hrRest: 50 }, declared);
+    expect(e.hrCalibration?.anchor.method).toBe('declared_race');
+    expect(e.hrCalibration!.factor).toBeCloseTo(41.9 / 35, 1);
+    expect(e.source).toBe('activities');
+    // le cardio a baissé de 2 points depuis le printemps : le niveau suit, à partir de la course
+    expect(e.vdot).toBeGreaterThan(38.5);
+    expect(e.vdot).toBeLessThan(40.5);
+    // sans course déclarée, pas de calibrage
+    expect(estimateFitness([...spring, ...autumn], '2026-10-30', { hrMax: 190, hrRest: 50 }).hrCalibration).toBeUndefined();
+  });
+
+  it('une performance s’érode après 4 semaines', () => {
+    const s = { date: '2026-09-01', vdot: 45, method: 'race' as const, name: 'x' };
+    expect(perfValue(s, '2026-09-20')).toBe(45);
+    expect(perfValue(s, '2026-11-28')).toBeCloseTo(43, 0);
+  });
+
+  it('ralentit semi et marathon quand le volume manque', () => {
+    expect(endurancePenalty(5000, 10, 5)).toBe(0);
+    expect(endurancePenalty(42195, 70, 32)).toBe(0);
+    expect(endurancePenalty(42195, 25, 12)).toBeGreaterThan(0.08);
+    expect(endurancePenalty(21097.5, 25, 12)).toBeLessThan(endurancePenalty(42195, 25, 12));
   });
 
   it('estime la FC seuil sur la droite FC / vitesse', () => {
@@ -418,9 +485,10 @@ describe('Niveau : moyenne des dernières sorties', () => {
     const acts = days(2).map((d) => run(d, 50, 0.7));
     const declared = declaredSamples({ level: 'intermediaire', sport: 'road', vmaTest: { distanceM: 1700, date: '2026-09-08' } });
     const e = estimateFitness(acts, '2026-09-10', { hrMax: 190, hrRest: 50 }, declared);
-    expect(e.source).toBe('activities');
+    // test récent, pas assez de sorties cardio : c'est lui qui fixe le niveau
+    expect(e.source).toBe('vma_test');
     expect(e.samples.map((s) => s.method)).toContain('vma_test');
-    expect(resolveProfile({ level: 'intermediaire', sport: 'road' }, e, '2026-09-10').vdotSource).toBe('activities');
+    expect(resolveProfile({ level: 'intermediaire', sport: 'road' }, e, '2026-09-10').vdotSource).toBe('vma_test');
   });
 });
 

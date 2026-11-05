@@ -322,12 +322,13 @@ const SAMPLE_COLOR: Record<Vo2Sample['method'], string> = {
   hr: 'var(--ink-3)',
   race: 'var(--i-thr)',
   declared_race: 'var(--i-thr)',
+  best_effort: 'var(--i-mod)',
   vma_test: 'var(--i-max)',
 };
 
 /**
- * Progression de la VO2 max : la moyenne glissante des 10 dernières mesures en courbe,
- * chaque mesure en point (gris : sortie avec cardio, ambre : course, violet : test VMA).
+ * Progression de la VO2 max : le niveau retenu jour après jour en courbe,
+ * chaque mesure en point (gris : sortie avec cardio, ambre : course, orange : meilleur effort, violet : test VMA).
  */
 export function ProgressChart({ points, samples, from, to }: { points: ProgressPoint[]; samples: Vo2Sample[]; from: string; to: string }) {
   const { ref: snapRef, top } = useGridSnap();
@@ -426,7 +427,7 @@ export function ProgressChart({ points, samples, from, to }: { points: ProgressP
       <div className="legend" style={{ marginLeft: 48 }}>
         <span>
           <i className="lg" style={{ borderTopColor: 'var(--c-forme)' }} />
-          Moyenne des 10 dernières mesures
+          Niveau retenu
         </span>
         <span>
           <i className="lg lg-box" style={{ background: 'var(--ink-3)', opacity: 0.55 }} />
@@ -436,6 +437,12 @@ export function ProgressChart({ points, samples, from, to }: { points: ProgressP
           <span>
             <i className="lg lg-box" style={{ background: 'var(--i-thr)' }} />
             Course
+          </span>
+        )}
+        {shown.some((s) => s.method === 'best_effort') && (
+          <span>
+            <i className="lg lg-box" style={{ background: 'var(--i-mod)' }} />
+            Meilleur effort (5 km, 10 km… le plus rapide d’une sortie)
           </span>
         )}
         {shown.some((s) => s.method === 'vma_test') && (

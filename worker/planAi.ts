@@ -32,7 +32,7 @@ import {
   type Workout,
 } from '../shared/engine';
 import { aiAllowed, declaredSamples, resolveProfile, type SavedProfile } from '../shared/profile';
-import { getUserById, loadActivities, loadDetails } from './activities';
+import { getUserById, loadActivities, loadDetails, loadRecordDetails } from './activities';
 import { DAILY_LIMIT, HttpError, snapshot, usage } from './coach';
 
 const now = () => Math.floor(Date.now() / 1000);
@@ -148,7 +148,11 @@ async function athleteContext(env: Env, uid: number) {
   const t = today();
   const { activities } = await loadActivities(env, u);
   const details = await loadDetails(env, u, activities).catch(() => []);
-  const estimate = estimateFitness(activities, t, saved ?? undefined, declaredSamples(saved));
+  // meilleurs efforts de tout le cache (pas seulement les 14 dernières sorties) : même niveau que sur le site
+  const efforts = await loadRecordDetails(env, u, activities)
+    .then((r) => r.details)
+    .catch(() => details);
+  const estimate = estimateFitness(activities, t, saved ?? undefined, declaredSamples(saved), efforts);
   const profile = resolveProfile(saved, estimate, t);
   const analysis = analyzeActivities(activities, details, profile, t);
   const paces = trainingPaces(profile.vdot);

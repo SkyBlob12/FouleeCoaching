@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { RefreshCw } from 'lucide-react';
 import {
   addDays,
@@ -10,7 +10,6 @@ import {
   isRun,
   type ActivitySummary,
 } from '@engine';
-import { api } from '../lib/api';
 import { useReady } from '../lib/data';
 import { today as todayIso } from '../lib/profile';
 import { formatDate } from '../lib/sessions';
@@ -61,19 +60,13 @@ const stravaUrl = (id: number) => `https://www.strava.com/activities/${id}`;
 const PAGE = 30;
 
 export function Activities() {
-  const { activities, activitiesError, me, refreshActivities, syncedAt } = useReady();
+  const { activities, activitiesError, me, refreshActivities, records: shared } = useReady();
   const [filter, setFilter] = useState<Filter>('all');
   const [shown, setShown] = useState(PAGE);
-  const [records, setRecords] = useState<Efforts | null>(null);
-  const [recordsError, setRecordsError] = useState<string | null>(null);
+  const records: Efforts | null = shared.loading && !shared.efforts.length ? null : shared;
+  const recordsError = shared.error ?? null;
   const t = todayIso();
   const recent = addDays(t, -6);
-
-  useEffect(() => {
-    api<Efforts>('/records')
-      .then(setRecords)
-      .catch((e: Error) => setRecordsError(e.message));
-  }, [syncedAt]);
 
   const runs = useMemo(() => activities.filter((a) => isRun(a.sportType)), [activities]);
   const sorted = useMemo(() => [...activities].sort((a, b) => b.startDate.localeCompare(a.startDate) || b.id - a.id), [activities]);

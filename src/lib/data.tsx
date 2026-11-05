@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import type { ActivitySummary, Plan, SessionFeedback, Workout } from '@engine';
+import type { ActivitySummary, EffortDetail, Plan, SessionFeedback, Workout } from '@engine';
 import { api, AuthError } from './api';
 import { estimateFrom, resolveProfile, type EffectiveProfile, type SavedProfile } from './profile';
 
@@ -34,6 +34,8 @@ interface DataState {
   activities: ActivitySummary[];
   activitiesError?: string;
   syncedAt?: number | null;
+  /** meilleurs efforts Strava des sorties (complétés par lots, les plus récentes d'abord) */
+  records: { efforts: EffortDetail[]; pending: number; error?: string; loading: boolean };
   plan: StoredPlan | null;
   sessions: CustomSession[];
   feedback: SessionFeedback[];
@@ -64,6 +66,7 @@ const initial: DataState = {
   config: { demo: false, strava: false },
   saved: null,
   activities: [],
+  records: { efforts: [], pending: 0, loading: false },
   plan: null,
   sessions: [],
   feedback: [],
@@ -73,6 +76,18 @@ const initial: DataState = {
 
 export function DataProvider({ children }: { children: ReactNode }) {
   const [s, setS] = useState<DataState>(initial);
+
+  /** Meilleurs efforts : 2 lots de 25 sorties au plus par chargement, pour ménager la limite de requêtes Strava. */
+  const loadRecords = useCallback(async () => {
+    setS((x) => ({ ...x, records: { ...x.records, loading: true, error: undefined } }));
+    try {
+      let r = await api<{ efforts: EffortDetail[]; pending: number }>('/records');
+      if (r.pending > 0) r = await api<{ efforts: EffortDetail[]; pending: number }>('/records');
+      setS((x) => ({ ...x, records: { efforts: r.efforts, pending: r.pending, loading: false } }));
+    } catch (e) {
+      setS((x) => ({ ...x, records: { ...x.records, loading: false, error: (e as Error).message } }));
+    }
+  }, []);
 
   const load = useCallback(async (refresh = false) => {
     const config = await api<DataState['config']>('/config').catch(() => initial.config);
@@ -88,7 +103,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         api<{ notes: CoachNote[] }>('/notes'),
         api<DataState['aiStatus']>('/ai/status').catch(() => initial.aiStatus),
       ]);
-      setS({
+      setS((x) => ({
         status: 'ready',
         config,
         me: user,
@@ -101,12 +116,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
         feedback: feedback.feedback,
         notes: notes.notes,
         aiStatus,
-      });
+        // on garde les meilleurs efforts déjà chargés le temps de les relire
+        records: x.records,
+      }));
+      if (acts.activities.length) loadRecords();
     } catch (e) {
       if (e instanceof AuthError) setS({ ...initial, status: 'anonymous', config });
       else setS({ ...initial, status: 'error', config, error: (e as Error).message });
     }
-  }, []);
+  }, [loadRecords]);
 
   useEffect(() => {
     load();
@@ -135,8 +153,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const profile = useMemo(() => {
     if (s.status !== 'ready') return undefined;
-    return resolveProfile(s.saved, estimateFrom(s.activities, s.saved));
-  }, [s.status, s.saved, s.activities]);
+    return resolveProfile(s.saved, estimateFrom(s.activities, s.saved, s.records.efforts));
+  }, [s.status, s.saved, s.activities, s.records.efforts]);
 
   const value: DataApi = {
     ...s,

@@ -10,6 +10,8 @@ import {
   hrZones,
   paceFor,
   pctVma,
+  endurancePenalty,
+  perfValue,
   predictTime,
   resolveHr,
   trainingPaces,
@@ -48,6 +50,7 @@ const LTHR_SOURCE: Record<NonNullable<EffectiveProfile['lthrSource']>, string> =
 const METHOD_LABEL: Record<Vo2Sample['method'], string> = {
   hr: 'Cardio et allure',
   race: 'Course',
+  best_effort: 'Meilleur effort',
   declared_race: 'Course déclarée',
   vma_test: 'Test VMA',
 };
@@ -114,12 +117,13 @@ function Progression({ points, samples, profile }: { points: ProgressPoint[]; sa
   ].filter((c): c is { label: string; p: ProgressPoint; mid: boolean } => !!c.p);
   const first = cols.length > 1 ? cols[0] : undefined;
   const win = profile.vdotSamples;
-  // la plus haute et la plus basse, écartées de la moyenne dès 6 mesures
-  const out = new Set<number>();
-  if (win.length >= 6) {
-    const vals = win.map((s) => s.vdot);
-    out.add(vals.indexOf(Math.min(...vals)));
-    out.add(vals.lastIndexOf(Math.max(...vals)));
+  // sorties cardio : la plus haute et la plus basse, écartées de la moyenne dès 6
+  const out = new Set<Vo2Sample>();
+  const hrWin = win.filter((s) => s.method === 'hr');
+  if (hrWin.length >= 6) {
+    const sorted = [...hrWin].sort((a, b) => a.vdot - b.vdot);
+    out.add(sorted[0]);
+    out.add(sorted[sorted.length - 1]);
   }
   const gain = first && now ? now.vdot - first.p.vdot : 0;
   const paceGain = first && now ? trainingPaces(first.p.vdot).threshold - trainingPaces(now.vdot).threshold : 0;
@@ -129,16 +133,18 @@ function Progression({ points, samples, profile }: { points: ProgressPoint[]; sa
       <div>
         <h2>Progression</h2>
         <p className="muted">
-          Ta VO2 max est la moyenne de tes 10 dernières mesures de moins de 4 mois. Chaque sortie de plus de 20 minutes avec cardio en donne une (le rapport
-          entre ton allure et ta FC), chaque course aussi, comme la course et le test VMA déclarés dans ton profil. Elle se recalcule à chaque synchronisation :
-          tes allures et tes zones suivent.
+          Ta VO2 max vient de ce que tu as couru ces 4 derniers mois. Une course (Strava ou déclarée) ou un test VMA la fixent. Sans course, c’est la
+          moyenne cardio de tes 10 dernières sorties de plus de 20 minutes (le rapport entre ton allure et ta FC), calibrée sur ta dernière course ou ton
+          dernier test de moins d’un an : chacun a sa propre FC, le cardio suit l’évolution et la course fixe le niveau. Ton meilleur effort Strava récent (le
+          5 km ou le 10 km le plus rapide couru dans une sortie) sert toujours de plancher : tu l’as réellement couru. Une performance perd 1 point par mois
+          au-delà de 4 semaines. Tout se recalcule à chaque synchronisation : tes allures et tes zones suivent.
         </p>
       </div>
 
       {points.length < 2 || !now ? (
         <p className="muted">
-          Pas encore assez de mesures. Il en faut au moins 3 sur 4 mois : des sorties de plus de 20 minutes avec une montre ou une ceinture cardio, des courses, ou
-          un test VMA déclaré dans <Link to="/profil">ton profil</Link>.
+          Pas encore assez de mesures sur 4 mois : une course, un meilleur effort Strava d’au moins 3 km, 3 sorties de plus de 20 minutes avec cardio, ou un
+          test VMA déclaré dans <Link to="/profil">ton profil</Link>.
         </p>
       ) : (
         <>
@@ -206,23 +212,29 @@ function Progression({ points, samples, profile }: { points: ProgressPoint[]; sa
 
           {win.length > 0 && (
             <details className="stack">
-              <summary className="small">Voir les {win.length} mesures de la moyenne actuelle</summary>
+              <summary className="small">Voir les {win.length} mesures prises en compte</summary>
               <table className="table">
                 <tbody>
-                  {win.map((s, i) => (
-                    <tr key={`${s.date}-${i}`} style={out.has(i) ? { color: 'var(--ink-3)' } : undefined}>
-                      <td className="n">{formatDate(s.date, { day: 'numeric', month: 'short' })}</td>
-                      <td>
-                        {s.name}
-                        <span className="small faint" style={{ display: 'block' }}>
-                          {METHOD_LABEL[s.method]}
-                          {s.method === 'hr' && s.avgHr ? `, ${s.avgHr} bpm de moyenne` : ''}
-                          {out.has(i) ? ', écartée (valeur extrême)' : ''}
-                        </span>
-                      </td>
-                      <td className="r n">{fr1(s.vdot)}</td>
-                    </tr>
-                  ))}
+                  {win.map((s, i) => {
+                    const basis = s === profile.vdotBasis;
+                    return (
+                      <tr key={`${s.date}-${i}`} style={out.has(s) ? { color: 'var(--ink-3)' } : basis ? { fontWeight: 600 } : undefined}>
+                        <td className="n">{formatDate(s.date, { day: 'numeric', month: 'short' })}</td>
+                        <td>
+                          {s.name}
+                          <span className="small faint" style={{ display: 'block', fontWeight: 400 }}>
+                            {METHOD_LABEL[s.method]}
+                            {s.effort ? ` : ${s.effort.label} en ${formatClock(s.effort.timeSec)}` : ''}
+                            {s.method === 'hr' && s.avgHr ? `, ${Math.round(s.avgHr)} bpm de moyenne` : ''}
+                            {s.rawVdot !== undefined ? ` (${fr1(s.rawVdot)} avant calibrage)` : ''}
+                            {out.has(s) ? ', écartée (valeur extrême)' : ''}
+                            {basis ? ', fixe ton niveau' : ''}
+                          </span>
+                        </td>
+                        <td className="r n">{fr1(s.vdot)}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </details>
@@ -237,9 +249,68 @@ function Progression({ points, samples, profile }: { points: ProgressPoint[]; sa
   );
 }
 
+/** Les trois sources du niveau, côte à côte : ce que tu as couru, ce que dit ton cardio. */
+function LevelBasis({ profile, pending }: { profile: EffectiveProfile; pending: number }) {
+  if (profile.vdotSource === 'manual') return null;
+  const t = today();
+  const top = (f: (s: Vo2Sample) => boolean) =>
+    profile.vdotSamples.filter(f).reduce<Vo2Sample | undefined>((m, s) => (!m || perfValue(s, t) > perfValue(m, t) ? s : m), undefined);
+  const race = top((s) => s.method === 'race' || s.method === 'declared_race' || s.method === 'vma_test');
+  const best = top((s) => s.method === 'best_effort');
+  const nHr = profile.vdotSamples.filter((s) => s.method === 'hr').length;
+  const cal = profile.hrCalibration;
+  const perf = (s: Vo2Sample) => (
+    <>
+      {s.effort ? `${s.effort.label} en ${formatClock(s.effort.timeSec)}` : s.name}, {formatDate(s.date, { day: 'numeric', month: 'short' })}
+      {perfValue(s, t) < s.vdot - 0.05 ? ` (${fr1(s.vdot)}, érodée avec le temps)` : ''}
+    </>
+  );
+  const rows = [
+    { label: 'Course ou test', on: race && (profile.vdotSource === 'race' || profile.vdotSource === 'declared_race' || profile.vdotSource === 'vma_test'), text: race ? perf(race) : 'aucun sur 4 mois', v: race ? perfValue(race, t) : undefined },
+    { label: 'Meilleur effort', on: profile.vdotSource === 'best_effort', text: best ? perf(best) : pending ? 'sorties en cours d’analyse' : 'aucun de 3 km ou plus', v: best ? perfValue(best, t) : undefined },
+    {
+      label: 'Cardio',
+      on: profile.vdotSource === 'activities',
+      text:
+        profile.hrVdot === undefined
+          ? 'pas assez de sorties avec FC'
+          : `moyenne de ${nHr} sorties${cal ? `, calibrée sur ${cal.anchor.method === 'vma_test' ? 'ton test VMA' : 'ta course'} du ${formatDate(cal.anchor.date, { day: 'numeric', month: 'short' })} (×${cal.factor.toLocaleString('fr-FR', { maximumFractionDigits: 2 })})` : ', non calibrée : renseigne une course'}`,
+      v: profile.hrVdot,
+    },
+  ];
+  return (
+    <div className="stat stack" style={{ gap: 6 }}>
+      <h3>Sur quoi c’est calculé</h3>
+      <table className="table">
+        <tbody>
+          {rows.map((r) => (
+            <tr key={r.label} style={r.on ? { fontWeight: 600 } : undefined}>
+              <td>
+                {r.label}
+                <span className="small faint" style={{ display: 'block', fontWeight: 400 }}>
+                  {r.text}
+                </span>
+              </td>
+              <td className="r n">{r.v !== undefined ? fr1(r.v) : '–'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="small muted">
+        En gras, ce qui fixe ta VO2 max{profile.vdotOffset ? `, ajustée de ${signed(profile.vdotOffset, 1)} d’après tes ressentis` : ''}. Une course passe avant le
+        cardio, qui peut la relever d’au plus 2 points. Ton meilleur effort sert de plancher.
+        {cal
+          ? ` Ton cardio est calibré sur ta course : à cette période il indiquait ${fr1(cal.hrAtAnchor)} pour un niveau réel de ${fr1(cal.anchor.vdot)}. Le même rapport corrige tes sorties suivantes.`
+          : ''}
+        {pending > 0 ? ` ${pending} sortie${pending > 1 ? 's' : ''} encore à analyser (limite de requêtes Strava) : elles compteront aux prochaines visites.` : ''}
+      </p>
+    </div>
+  );
+}
+
 export function Fitness() {
-  const { activities, profile, refreshActivities, syncedAt, me, saved } = useReady();
-  const progress = useMemo(() => progressionFrom(activities, saved), [activities, saved]);
+  const { activities, profile, refreshActivities, syncedAt, me, saved, records } = useReady();
+  const progress = useMemo(() => progressionFrom(activities, saved, records.efforts), [activities, saved, records.efforts]);
   const points = useMemo(() => computeFitness(activities, profile, 120), [activities, profile]);
   const analysis = useMemo(() => analyzeActivities(activities, [], profile, today()), [activities, profile]);
   const form = readForm(points.at(-1));
@@ -359,6 +430,7 @@ export function Fitness() {
               VMA <b>{profile.vma.toLocaleString('fr-FR', { minimumFractionDigits: 1 })} km/h</b>, VO2 max {profile.vdot.toLocaleString('fr-FR')},{' '}
               {vdotSourceLabel(profile)}.
             </p>
+            <LevelBasis profile={profile} pending={records.pending} />
             <table className="table">
               <thead>
                 <tr>
@@ -391,7 +463,7 @@ export function Fitness() {
             <table className="table">
               <tbody>
                 {RACES.map((r) => {
-                  const t = predictTime(profile.vdot, r.m);
+                  const t = predictTime(profile.vdot, r.m) * (1 + endurancePenalty(r.m, profile.weeklyKm, profile.longRunKm));
                   return (
                     <tr key={r.label}>
                       <td>{r.label}</td>
@@ -402,6 +474,10 @@ export function Fitness() {
                 })}
               </tbody>
             </table>
+            <p className="small muted">
+              Sur route plate, après un affûtage. Le semi et le marathon tiennent compte de ton volume : {Math.round(profile.weeklyKm)} km par semaine sur 4
+              semaines, sortie longue de {Math.round(profile.longRunKm)} km sur 6 semaines. Plus tu en fais, plus tu te rapproches du temps théorique de ta VO2 max.
+            </p>
           </section>
 
           <section className="stack">
